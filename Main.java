@@ -1,15 +1,14 @@
 package assignment4;
 /* CRITTERS Main.java
  * EE422C Project 4 submission by
- * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Shehryar Ahmed
+ * SA43897
+ * 16345
+ * Nicholas Duggar
+ * NBD422
+ * 16345
  * Slip days used: <0>
- * Fall 2016
+ * Fall 2018
  */
 
 import java.util.Scanner;
@@ -69,6 +68,76 @@ public class Main {
 
         /* Do not alter the code above for your submission. */
         /* Write your code below. */
+        boolean simulation_is_running = true;
+        while(simulation_is_running) {
+        	String command = kb.nextLine();
+            if(command.equals("quit")) {
+            	// terminate program
+            }
+            else if(command.equals("show")) {
+            	Critter.displayWorld();
+            }
+            else if(command.substring(0, 4).equals("step")){
+            	String[] command_line = command.split(" ");
+            	int count = 0;
+            	try {
+            		count = Integer.parseInt(command_line[1]);
+            	}
+            	catch(Exception e) {
+            		// either there wasn't an additional argument, or it wasn't an int. Either way, the command is invalid
+            		System.out.println("Bad command"); // TODO: what error message do we print?
+            	}
+            	if(count > 0) {
+            		for(int i = 0; i < count; i++) {
+            			Critter.worldTimeStep();
+            		}
+            	}
+            	else if(count < 0) {
+            		// TODO: print some kind of error with the count!
+            	}
+            	else {
+            		Critter.worldTimeStep();
+            	}
+            }
+            else if(command.substring(0, 4).equals("seed")) {
+            	String[] command_line = command.split(" ");
+            	long seed = 0;
+            	try {
+            		seed = Long.parseLong(command_line[1]);
+            		Critter.setSeed(seed);
+            	}
+            	catch(Exception e) {
+            		// either there wasn't an additional argument, or it wasn't an int. Either way, the command is invalid
+            		System.out.println("Bad command"); // TODO: what error message do we print?
+            	}
+            	
+            }
+            else if(command.substring(0, 4).equals("make")) {
+            	String[] command_line = command.split(" ");
+            	int count = 0;
+            	try {
+            		Critter.makeCritter(command_line[1]);
+            		count = Integer.parseInt(command_line[2]); // this should be optional, so this may not be included and so might cause issues
+            	}
+            	catch(Exception e) {
+            		// for ArrayOutOfBounds, parsing, or InvalildCritterExceptions
+            		System.out.println("Bad command"); // TODO: what error message do we print?
+            	}
+            }
+            else if(command.substring(0, 4).equals("stats")) {
+            	String[] command_line = command.split(" ");
+            	try {
+            		Critter.runStats(Critter.getInstances(command_line[1]));
+            	}
+            	catch(InvalidCritterException ice) {
+            		System.out.println("Bad critter name");
+            	}
+            	catch(Exception e) {
+            		System.out.println("Malformed command");
+            	}
+            }
+        }
+        
         // TODO: make command parser, for quit, show, step, seed, make, stats
         // System.out.println("GLHF");
         

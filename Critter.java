@@ -1,16 +1,16 @@
 package assignment4;
 /* CRITTERS Critter.java
  * EE422C Project 4 submission by
- * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Shehryar Ahmed
+ * SA43897
+ * 16345
+ * Nicholas Duggar
+ * NBD422
+ * 16345
  * Slip days used: <0>
- * Fall 2016
+ * Fall 2018
  */
+
 
 
 import java.util.List;
@@ -51,20 +51,39 @@ public abstract class Critter {
 	private int y_coord;
 	
 	protected final void walk(int direction) {
-		// TODO: implement
+		if(direction == 8 || direction < 2) {
+			this.x_coord++;
+		}
+		else if(direction > 2 && direction < 6) {
+			this.x_coord--;
+		}
+		if(direction > 0 && direction < 4) {
+			this.y_coord--;
+		}
+		else if(direction > 4) {
+			this.y_coord++;
+		}
+		this.x_coord = this.x_coord % Params.world_width;
+		this.y_coord = this.y_coord % Params.world_height;
+		this.energy -= Params.walk_energy_cost;
+		// TODO: verify/debug
 	}
 	
 	protected final void run(int direction) {
-		// TODO: implement
-		
+		this.walk(direction);
+		this.walk(direction);
+		this.energy += 2 * Params.walk_energy_cost;
+		this.energy -= Params.run_energy_cost;
+		// TODO: verify/debug
 	}
 	
 	protected final void reproduce(Critter offspring, int direction) {
+		
 		// TODO: implement
 	}
 
-	public abstract void doTimeStep(); // TODO: implement
-	public abstract boolean fight(String oponent); // TODO: implement
+	public abstract void doTimeStep();
+	public abstract boolean fight(String oponent);
 	
 	/**
 	 * create and initialize a Critter subclass.
@@ -77,7 +96,15 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
-		// TODO: implement
+		try {
+			Class critter_class = Class.forName(myPackage + critter_class_name);
+			Critter created_critter = (Critter) critter_class.newInstance();
+			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
+		}
+		catch(Exception e) {
+			throw new InvalidCritterException(critter_class_name); // This may be too general; do we blame the class name for all problems?
+		}
+		// TODO: verify/debug
 	}
 	
 	/**
@@ -88,7 +115,18 @@ public abstract class Critter {
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
-		// TODO: implement
+		Class critter_class;
+		try {
+			critter_class = Class.forName(myPackage + critter_class_name);
+		} catch (ClassNotFoundException e) {
+			throw new InvalidCritterException(critter_class_name);
+		}
+		for(Critter critter : population) {
+			if(critter_class.isInstance(critter)) {
+				result.add(critter);
+			}
+		}
+		// TODO: verify/debug
 		return result;
 	}
 	
@@ -173,12 +211,14 @@ public abstract class Critter {
 	 * Clear the world of all critters, dead and alive
 	 */
 	public static void clearWorld() {
-		// Complete this method.
-		// TODO: implement
+		population = new java.util.ArrayList<Critter>();
+		babies = new java.util.ArrayList<Critter>();
 	}
 	
 	public static void worldTimeStep() {
-		// Complete this method.
+	    for(Critter crit : population) {
+	    	crit.doTimeStep(); // theoretically enough?
+	    }
 		// TODO: implement
 	}
 	
