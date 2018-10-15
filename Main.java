@@ -69,7 +69,7 @@ public class Main {
 
         /* Do not alter the code above for your submission. */
         /* Write your code below. */
-        
+        // TODO: make command parser, for quit, show, step, seed, make, stats
         // System.out.println("GLHF");
         
         /* Write your code above */

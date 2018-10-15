@@ -51,17 +51,20 @@ public abstract class Critter {
 	private int y_coord;
 	
 	protected final void walk(int direction) {
+		// TODO: implement
 	}
 	
 	protected final void run(int direction) {
+		// TODO: implement
 		
 	}
 	
 	protected final void reproduce(Critter offspring, int direction) {
+		// TODO: implement
 	}
 
-	public abstract void doTimeStep();
-	public abstract boolean fight(String oponent);
+	public abstract void doTimeStep(); // TODO: implement
+	public abstract boolean fight(String oponent); // TODO: implement
 	
 	/**
 	 * create and initialize a Critter subclass.
@@ -74,6 +77,7 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
+		// TODO: implement
 	}
 	
 	/**
@@ -84,7 +88,7 @@ public abstract class Critter {
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
-	
+		// TODO: implement
 		return result;
 	}
 	
@@ -109,7 +113,8 @@ public abstract class Critter {
 			System.out.print(prefix + s + ":" + critter_count.get(s));
 			prefix = ", ";
 		}
-		System.out.println();		
+		System.out.println();	
+		// TODO: is this final? Do we need to implement anything more for this method?
 	}
 	
 	/* the TestCritter class allows some critters to "cheat". If you want to 
@@ -169,13 +174,16 @@ public abstract class Critter {
 	 */
 	public static void clearWorld() {
 		// Complete this method.
+		// TODO: implement
 	}
 	
 	public static void worldTimeStep() {
 		// Complete this method.
+		// TODO: implement
 	}
 	
 	public static void displayWorld() {
 		// Complete this method.
+		// TODO: implement
 	}
 }
