@@ -97,7 +97,7 @@ public abstract class Critter {
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try {
-			Class critter_class = Class.forName(myPackage + critter_class_name);
+			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
 			Critter created_critter = (Critter) critter_class.newInstance();
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
@@ -117,7 +117,7 @@ public abstract class Critter {
 		List<Critter> result = new java.util.ArrayList<Critter>();
 		Class critter_class;
 		try {
-			critter_class = Class.forName(myPackage + critter_class_name);
+			critter_class = Class.forName(myPackage + "." + critter_class_name);
 		} catch (ClassNotFoundException e) {
 			throw new InvalidCritterException(critter_class_name);
 		}
@@ -223,7 +223,33 @@ public abstract class Critter {
 	}
 	
 	public static void displayWorld() {
+		String top_and_bottom = "+";
+		for(int i = 0; i < Params.world_width; i++) {
+			top_and_bottom += "-";
+		}
+		top_and_bottom += "+";
+		String[] rows = new String[Params.world_height];
+		for(int i = 0; i < Params.world_height; i++) {
+			for(int j = 0; j < Params.world_width; j++) {
+				if(j == 0) {
+					rows[i] = "|";
+				}
+				rows[i] += " ";
+				if(j == Params.world_width - 1) {
+					rows[i] += "|";
+				}
+			}
+		}
+		for(Critter crit : population) {
+			rows[crit.y_coord] = rows[crit.y_coord].substring(0, crit.x_coord) + crit.toString() + rows[crit.y_coord].substring(crit.x_coord + 1, rows[crit.y_coord].length());
+		}
+		System.out.println(top_and_bottom);
+		for(String row : rows) {
+			System.out.println(row);
+		}
+		System.out.println(top_and_bottom);
+		
 		// Complete this method.
-		// TODO: implement
+		// TODO: debug!
 	}
 }
