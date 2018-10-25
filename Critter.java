@@ -96,20 +96,38 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
-		//Class<?> critter = null
-		//Constuctor<?> contrucctor ofmycrittre = null
+		//Class<?> critter = null;
+		//Constuctor<?> contructorofmycritter = null;
 		//Object instanceofmycritter = null;
 		try {
+			//Class critter_class = Class.forName(myPackage + "." + critter_class_name);
+			//contructorofmycritter = critter.getConstructor();
+			//instanceofmycritter = contructorofmycritter.newInstance()
 			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
-			//constructorofmycritter = mycritter.getConstructor()
-			//instanseofmycritter = constructorofmycrutter.newInstance()
 			Critter created_critter = (Critter) critter_class.newInstance();
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
 		catch(Exception e) {
 			throw new InvalidCritterException(critter_class_name); // This may be too general; do we blame the class name for all problems?
 		}
-		//return (critter)instanceofmycritter
+		//return (Critter)instanceofmycritter;
+		// TODO: verify/debug
+	}
+	public static Critter makeCritter2(String critter_class_name) throws InvalidCritterException {
+		Class<?> critter = null;
+		Constuctor<?> contructorofmycritter = null;
+		Object instanceofmycritter = null;
+		try {
+			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
+			contructorofmycritter = critter.getConstructor();
+			instanceofmycritter = contructorofmycritter.newInstance()
+			//Critter created_critter = (Critter) critter_class.newInstance();
+			//population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
+		}
+		catch(Exception e) {
+			throw new InvalidCritterException(critter_class_name); // This may be too general; do we blame the class name for all problems?
+		}
+		return (Critter)instanceofmycritter;
 		// TODO: verify/debug
 	}
 	
