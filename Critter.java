@@ -96,14 +96,20 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
+		//Class<?> critter = null
+		//Constuctor<?> contrucctor ofmycrittre = null
+		//Object instanceofmycritter = null;
 		try {
 			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
+			//constructorofmycritter = mycritter.getConstructor()
+			//instanseofmycritter = constructorofmycrutter.newInstance()
 			Critter created_critter = (Critter) critter_class.newInstance();
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
 		catch(Exception e) {
 			throw new InvalidCritterException(critter_class_name); // This may be too general; do we blame the class name for all problems?
 		}
+		//return (critter)instanceofmycritter
 		// TODO: verify/debug
 	}
 	
@@ -133,6 +139,15 @@ public abstract class Critter {
 	/**
 	 * Prints out how many Critters of each type there are on the board.
 	 * @param critters List of Critters.
+	 */
+	/*pub static void criterstats(string ){
+	 * List<critter> listcrit = null
+	 * class<?> mycrit = null;
+	 * try{
+	 * mycrit.class.forname("package"+".")
+	 * }
+	 * }
+	 * 
 	 */
 	public static void runStats(List<Critter> critters) {
 		System.out.print("" + critters.size() + " critters as follows -- ");
