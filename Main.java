@@ -70,6 +70,7 @@ public class Main {
         /* Write your code below. */
         boolean simulation_is_running = true;
         while(simulation_is_running) {
+        	System.out.print("critter>");
         	String command = kb.nextLine();
             if(command.equals("quit")) {
             	simulation_is_running = false;
@@ -136,6 +137,9 @@ public class Main {
                     	catch(Exception e) {
                     		System.out.println("error processing: " + command);
                     	}
+                	}
+                	else {
+                		System.out.println("invalid command: " + command);
                 	}
                 }
                 else {

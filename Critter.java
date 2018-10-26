@@ -51,7 +51,7 @@ public abstract class Critter {
 	private int y_coord;
 	
 	protected final void walk(int direction) {
-		if(direction == 8 || direction < 2) {
+		if(direction == 7 || direction < 2) {
 			this.x_coord++;
 		}
 		else if(direction > 2 && direction < 6) {
@@ -65,6 +65,12 @@ public abstract class Critter {
 		}
 		this.x_coord = this.x_coord % Params.world_width;
 		this.y_coord = this.y_coord % Params.world_height;
+		if(this.x_coord < 0) {
+			this.x_coord = Params.world_width - 1;
+		}
+		if(this.y_coord < 0) {
+			this.y_coord = Params.world_height - 1;
+		}
 		this.energy -= Params.walk_energy_cost;
 		// TODO: verify/debug
 	}
@@ -99,6 +105,9 @@ public abstract class Critter {
 		try {
 			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
 			Critter created_critter = (Critter) critter_class.newInstance();
+			created_critter.energy = Params.start_energy;
+			created_critter.x_coord = Critter.getRandomInt(Params.world_width - 1);
+			created_critter.y_coord = Critter.getRandomInt(Params.world_height - 1);
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
 		catch(Exception e) {
@@ -241,7 +250,7 @@ public abstract class Critter {
 			}
 		}
 		for(Critter crit : population) {
-			rows[crit.y_coord] = rows[crit.y_coord].substring(0, crit.x_coord) + crit.toString() + rows[crit.y_coord].substring(crit.x_coord + 1, rows[crit.y_coord].length());
+			rows[crit.y_coord] = rows[crit.y_coord].substring(0, crit.x_coord + 1) + crit.toString() + rows[crit.y_coord].substring(crit.x_coord + 2, rows[crit.y_coord].length());
 		}
 		System.out.println(top_and_bottom);
 		for(String row : rows) {
