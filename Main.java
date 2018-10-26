@@ -12,7 +12,6 @@ package assignment4;
  */
 
 import java.util.Scanner;
-import java.awt.List;
 import java.io.*;
 
 
@@ -150,7 +149,7 @@ public class Main {
                 				java.util.List<Critter> instances = Critter.getInstances(command_line[1]);
                 				try {
                 					Class critterClass = Class.forName(myPackage + "." + command_line[1]);
-                					critterClass.getMethod("runStats", List.class).invoke(null, instances); // null is object being invoked from, but this is static!
+                					critterClass.getMethod("runStats", java.util.List.class).invoke(null, instances); // null is object being invoked from, but this is static!
                 				}
                 				catch(Exception e) {
                 					// runStats was not implemented by the given subclass of Critter, so do Critter.runStats instead
