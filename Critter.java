@@ -50,15 +50,20 @@ public abstract class Critter {
 	
 	private int x_coord;
 	private int y_coord;
+	private int version;
+	private static int global_version = 0;
 	
 	private static boolean determining_encounters;
 	
 	protected final void walk(int direction) {
-
+		
+		if (this.version != global_version) {
 		this.x_coord = newX(this.x_coord,direction,1);
 		this.y_coord = newX(this.y_coord,direction,1);
+		this.version = global_version;
+		}
+		
 		this.energy -= Params.walk_energy_cost;
-		// TODO: verify/debug
 	}
 	
 //	private final void updatecoord() {
@@ -67,8 +72,11 @@ public abstract class Critter {
 	
 	
 	protected final void run(int direction) {
+		if(this.version != global_version) {
 		this.x_coord = newX(this.x_coord,direction,2);
 		this.y_coord = newX(this.y_coord,direction,2);
+		this.version = global_version;
+		}
 		this.energy -= Params.run_energy_cost;
 		// TODO: verify/debug
 	}
@@ -121,8 +129,20 @@ public abstract class Critter {
 	}
 	
 	protected final void reproduce(Critter offspring, int direction) {
+		if(this.energy < Params.min_reproduce_energy) {
+			return;
+		}
+		offspring.x_coord = newX(offspring.x_coord,direction, 1);
+		offspring.y_coord = newX(offspring.y_coord,direction, 1);
+		offspring.energy = this.energy/2;
+		offspring.version = global_version;
 		
-		// TODO: implement
+		if(this.energy %2 ==1) {
+			this.energy++;
+		}
+		this.energy /= 2;
+		babies.add(offspring);
+	
 	}
 
 	public abstract void doTimeStep();
@@ -145,6 +165,7 @@ public abstract class Critter {
 			created_critter.energy = Params.start_energy;
 			created_critter.x_coord = Critter.getRandomInt(Params.world_width - 1);
 			created_critter.y_coord = Critter.getRandomInt(Params.world_height - 1);
+			created_critter.version = global_version;
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
 		catch(Exception e) {
@@ -262,6 +283,7 @@ public abstract class Critter {
 	}
 	
 	public static void worldTimeStep() {
+		global_version++;
 	    for(Critter crit : population) {
 	    	crit.doTimeStep(); // theoretically enough?
 	    }
@@ -299,7 +321,19 @@ public abstract class Critter {
 				}
 				
 			}
+			crit.energy -= Params.rest_energy_cost;
 		}
+		
+		Iterator it = population.iterator();
+		while(it.hasNext()) {
+			Critter crit = (Critter) it.next();
+			if (crit.energy<1) {
+				it.remove();
+			}
+		}
+		population.addAll(babies);
+		babies = new java.util.ArrayList<Critter>();
+		
 	}
 	
 	public static void displayWorld() {
@@ -333,7 +367,5 @@ public abstract class Critter {
 		// TODO: debug!
 	}
 	
-	protected final Critter look(int direction) {
-		xcoord = 
-	}
+
 }
