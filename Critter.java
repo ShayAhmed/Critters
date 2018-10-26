@@ -120,7 +120,7 @@ public abstract class Critter {
 	
 	private final Critter check_encounter() {
 		for (Critter crit:population) {
-			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0) {
+			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0 && crit != this) {
 				return crit;
 			}
 
@@ -333,6 +333,14 @@ public abstract class Critter {
 		}
 		population.addAll(babies);
 		babies = new java.util.ArrayList<Critter>();
+		for(int i = 0; i < Params.refresh_algae_count; i++) {
+			try {
+				Critter.makeCritter("Algae");
+			}
+			catch (Exception e) {
+				// we are assuming that algae is to be included, so we need not do anything here
+			}
+		}
 		
 	}
 	
