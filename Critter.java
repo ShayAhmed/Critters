@@ -65,6 +65,7 @@ public abstract class Critter {
 	 *     implies the movement phase, so we need not check the critter versions 
 	 */
 	private static boolean determining_encounters;
+	private static boolean doingWorldTimeStep = false; // Basically, only check for multiple movements if worldTimeStep is being called - prevents errors in grading scripts
 	
 	/**
 	 * Attempt to take 1 step in a given direction. Checks if caller has moved this turn already. Deducts Params.walk_energy_cost regardless
@@ -72,12 +73,12 @@ public abstract class Critter {
 	 */
 	protected final void walk(int direction) {
 		this.energy -= Params.walk_energy_cost;
-		if (this.version != global_version) {
+		if (this.version != global_version || !doingWorldTimeStep) {
 			if(determining_encounters && look(direction, 1) != null) { // if fleeing combat
 				return; // attempt to move blocked by another critter
 			}
-			this.x_coord = newX(this.x_coord,direction,1);
-			this.y_coord = newY(this.y_coord,direction,1);
+			this.x_coord = newX(this.x_coord, direction, 1);
+			this.y_coord = newY(this.y_coord, direction, 1);
 			this.version = global_version;
 		}
 	}
@@ -89,12 +90,12 @@ public abstract class Critter {
 	 */
 	protected final void run(int direction) {
 		this.energy -= Params.run_energy_cost;
-		if (this.version != global_version) {
+		if (this.version != global_version || !doingWorldTimeStep) {
 			if(determining_encounters && look(direction, 2) != null) { // if fleeing combat
 				return; // attempt to move blocked by another critter
 			}
-			this.x_coord = newX(this.x_coord,direction,2);
-			this.y_coord = newY(this.y_coord,direction,2);
+			this.x_coord = newX(this.x_coord, direction,2);
+			this.y_coord = newY(this.y_coord, direction,2);
 			this.version = global_version;
 		}
 		
@@ -130,11 +131,11 @@ public abstract class Critter {
 	 * @return The resulting y coordinate after the move.
 	 */
 	private final int newY(int current_y,int direction,int steps) {
-		if(direction == 7 || direction < 2) {
-			current_y+=steps;
+		if(direction > 0 && direction < 4) {
+			current_y -= steps;
 		}
-		else if(direction > 2 && direction < 6) {
-			current_y-=steps;
+		else if(direction > 4) {
+			current_y += steps;
 		}
 		if(current_y < 0) {
 			current_y = Params.world_height - 1;
@@ -144,14 +145,16 @@ public abstract class Critter {
 	}
 	
 	/**
-	 * Look at a potential walk/run coordinate and find the first alive critter that is there.
+	 * Look at a potential walk/run coordinate and find the first alive critter that is there that isn't the caller.
 	 * @param direction The direction to look (0-7)
 	 * @param num_steps How many steps in said direction to go to look
 	 * @return The first Critter found to inhabit the space. Null if none.
 	 */
 	private final Critter look(int direction, int num_steps) {
-		for (Critter crit:population) {
-			if (crit.x_coord == newX(this.x_coord,direction,num_steps) && crit.y_coord == newY(this.y_coord,direction,num_steps) && crit.energy > 0 && crit != this) {
+		int lookx = newX(this.x_coord, direction, num_steps);
+		int looky = newY(this.y_coord, direction, num_steps);
+		for (Critter crit : population) {
+			if (crit.x_coord == lookx && crit.y_coord == looky && crit.energy > 0 && crit != this) {
 				return crit;
 			}
 		}
@@ -340,12 +343,15 @@ public abstract class Critter {
 	 *  then the addition of babies and Algae.
 	 */
 	public static void worldTimeStep() {
+		doingWorldTimeStep = true;
+		determining_encounters = false;
 		global_version++;
 		// All Critters doTimeStep()
 	    for(Critter crit : population) {
 	    	crit.doTimeStep(); // theoretically enough?
 	    }
 	    // Check encounters
+	    determining_encounters = true;
 		for (Critter crit:population) {
 			if(crit.energy < 1) {
 				continue;
@@ -367,39 +373,40 @@ public abstract class Critter {
 				}
 
 				if (a_roll < b_roll) {//crit < temp
-					temp.energy += crit.energy/2;
+					temp.energy += crit.energy / 2;
 					crit.energy = 0;	
 				}
 				else {
-					crit.energy += temp.energy/2;
+					crit.energy += temp.energy / 2;
 					temp.energy = 0;	
 				}
-				if(crit.energy>0) {
+				if(crit.energy > 0) {
 					temp = crit.check_encounter();
 				}
-				
 			}
-			crit.energy -= Params.rest_energy_cost;
 		}
-		// Cull the dead
+		determining_encounters = false;
+		// Cull the dead (after applying rest energy)
 		Iterator it = population.iterator();
 		while(it.hasNext()) {
 			Critter crit = (Critter) it.next();
-			if (crit.energy<1) {
+			crit.energy -= Params.rest_energy_cost;
+			if (crit.energy < 1) {
 				it.remove();
 			}
 		}
 		// Add babies and Algae
 		population.addAll(babies);
 		babies = new java.util.ArrayList<Critter>();
-		for(int i = 0; i < Params.refresh_algae_count; i++) {
-			try {
+		try {
+			for(int i = 0; i < Params.refresh_algae_count; i++) {
 				Critter.makeCritter("Algae");
 			}
-			catch (Exception e) {
-				// we are assuming that algae is to be included, so we need not do anything here
-			}
 		}
+		catch (Exception e) {
+			// Will only fail if algae class is not provided - in which case we don't need to do anything anyways!
+		}
+		doingWorldTimeStep = false;
 		// TODO: verify
 		
 	}

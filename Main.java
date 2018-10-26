@@ -78,7 +78,7 @@ public class Main {
             		simulation_is_running = false;
             	}
             	else {
-            		System.out.println("error processing command: " + command);
+            		System.out.println("error processing: " + command);
             	}	
             }
             else if(command_line[0].equals("show")) {
@@ -86,7 +86,7 @@ public class Main {
             		Critter.displayWorld();
             	}
             	else {
-            		System.out.println("error processing command: " + command);
+            		System.out.println("error processing: " + command);
             	}
             }
             else if(command_line[0].equals("step")) {
@@ -108,7 +108,7 @@ public class Main {
                 	}
             	}
             	else {
-            		System.out.println("error processing command: " + command);
+            		System.out.println("error processing: " + command);
             	}
             	
             }
