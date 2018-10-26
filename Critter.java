@@ -77,7 +77,7 @@ public abstract class Critter {
 				return; // attempt to move blocked by another critter
 			}
 			this.x_coord = newX(this.x_coord,direction,1);
-			this.y_coord = newX(this.y_coord,direction,1);
+			this.y_coord = newY(this.y_coord,direction,1);
 			this.version = global_version;
 		}
 	}
@@ -94,7 +94,7 @@ public abstract class Critter {
 				return; // attempt to move blocked by another critter
 			}
 			this.x_coord = newX(this.x_coord,direction,2);
-			this.y_coord = newX(this.y_coord,direction,2);
+			this.y_coord = newY(this.y_coord,direction,2);
 			this.version = global_version;
 		}
 		
@@ -115,11 +115,10 @@ public abstract class Critter {
 		else if(direction > 2 && direction < 6) {
 			current_x -= steps;
 		}
-		
-		current_x = current_x % Params.world_width;
 		if(current_x < 0) {
 			current_x = Params.world_width - 1;
 		}
+		current_x = current_x % Params.world_width;
 		return current_x;
 	}
 	
@@ -137,10 +136,10 @@ public abstract class Critter {
 		else if(direction > 2 && direction < 6) {
 			current_y-=steps;
 		}
-		current_y = current_y % Params.world_height;
 		if(current_y < 0) {
 			current_y = Params.world_height - 1;
 		}
+		current_y = current_y % Params.world_height;
 		return current_y;
 	}
 	
@@ -184,8 +183,8 @@ public abstract class Critter {
 		if(this.energy < Params.min_reproduce_energy) {
 			return;
 		}
-		offspring.x_coord = newX(offspring.x_coord,direction, 1);
-		offspring.y_coord = newX(offspring.y_coord,direction, 1);
+		offspring.x_coord = newX(this.x_coord,direction, 1);
+		offspring.y_coord = newY(this.y_coord,direction, 1);
 		offspring.energy = this.energy/2;
 		offspring.version = global_version;
 		
