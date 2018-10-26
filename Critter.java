@@ -13,6 +13,7 @@ package assignment4;
 
 
 
+import java.util.Iterator;
 import java.util.List;
 
 /* see the PDF for descriptions of the methods and fields in this class
@@ -111,9 +112,10 @@ public abstract class Critter {
 	
 	private final Critter check_encounter() {
 		for (Critter crit:population) {
-			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord) {
+			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0) {
 				return crit;
 			}
+
 		}
 		return null;
 	}
@@ -260,13 +262,42 @@ public abstract class Critter {
 	}
 	
 	public static void worldTimeStep() {
-		
 	    for(Critter crit : population) {
 	    	crit.doTimeStep(); // theoretically enough?
 	    }
+	    
 		for (Critter crit:population) {
-			while(crit.check_encounter()!=null) {
-				//do fight
+			if(crit.energy < 1) {
+				continue;
+			}
+			Critter temp = crit.check_encounter();
+			while(temp != null) {
+				boolean a_fight = crit.fight(temp.toString());
+				boolean b_fight = temp.fight(crit.toString());
+				if(temp.energy < 1 || crit.energy<1 || temp.x_coord != crit.x_coord|| temp.y_coord != crit.y_coord) {
+					break;
+				}
+				int a_roll = 0;
+				int b_roll = 0;
+				if (a_fight) {
+					a_roll = Critter.getRandomInt(crit.energy);
+				}
+				if (b_fight) {
+					b_roll = Critter.getRandomInt(temp.energy);
+				}
+
+				if (a_roll < b_roll) {//crit < temp
+					temp.energy += crit.energy/2;
+					crit.energy = 0;	
+				}
+				else {
+					crit.energy += temp.energy/2;
+					temp.energy = 0;	
+				}
+				if(crit.energy>0) {
+					temp = crit.check_encounter();
+				}
+				
 			}
 		}
 	}
