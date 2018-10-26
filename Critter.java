@@ -50,37 +50,72 @@ public abstract class Critter {
 	private int x_coord;
 	private int y_coord;
 	
+	private static boolean determining_encounters;
+	
 	protected final void walk(int direction) {
-		if(direction == 7 || direction < 2) {
-			this.x_coord++;
-		}
-		else if(direction > 2 && direction < 6) {
-			this.x_coord--;
-		}
-		if(direction > 0 && direction < 4) {
-			this.y_coord--;
-		}
-		else if(direction > 4) {
-			this.y_coord++;
-		}
-		this.x_coord = this.x_coord % Params.world_width;
-		this.y_coord = this.y_coord % Params.world_height;
-		if(this.x_coord < 0) {
-			this.x_coord = Params.world_width - 1;
-		}
-		if(this.y_coord < 0) {
-			this.y_coord = Params.world_height - 1;
-		}
+
+		this.x_coord = newX(this.x_coord,direction,1);
+		this.y_coord = newX(this.y_coord,direction,1);
 		this.energy -= Params.walk_energy_cost;
 		// TODO: verify/debug
 	}
 	
+//	private final void updatecoord() {
+//		
+//	}
+	
+	
 	protected final void run(int direction) {
-		this.walk(direction);
-		this.walk(direction);
-		this.energy += 2 * Params.walk_energy_cost;
+		this.x_coord = newX(this.x_coord,direction,2);
+		this.y_coord = newX(this.y_coord,direction,2);
 		this.energy -= Params.run_energy_cost;
 		// TODO: verify/debug
+	}
+	
+	private final int newX(int current_x,int direction,int numstepstodo) {
+		if(direction == 7 || direction < 2) {
+			current_x+=numstepstodo;
+		}
+		else if(direction > 2 && direction < 6) {
+			current_x-=numstepstodo;
+		}
+		
+		current_x = current_x % Params.world_width;
+		if(current_x < 0) {
+			current_x = Params.world_width - 1;
+		}
+		return current_x;
+	}
+	private final int newY(int current_y,int direction,int numstepstodo) {
+		if(direction == 7 || direction < 2) {
+			current_y+=numstepstodo;
+		}
+		else if(direction > 2 && direction < 6) {
+			current_y-=numstepstodo;
+		}
+		current_y = current_y % Params.world_height;
+		if(current_y < 0) {
+			current_y = Params.world_height - 1;
+		}
+		return current_y;
+	}
+	
+	private final Critter look(int direction, int num_steps) {
+		for (Critter crit:population) {
+			if (crit.x_coord == newX(this.x_coord,direction,num_steps) &&crit.y_coord == newX(this.y_coord,direction,num_steps)) {
+				return crit;
+			}
+		}
+		return null;
+	}
+	
+	private final Critter check_encounter() {
+		for (Critter crit:population) {
+			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord) {
+				return crit;
+			}
+		}
+		return null;
 	}
 	
 	protected final void reproduce(Critter offspring, int direction) {
@@ -225,10 +260,15 @@ public abstract class Critter {
 	}
 	
 	public static void worldTimeStep() {
+		
 	    for(Critter crit : population) {
 	    	crit.doTimeStep(); // theoretically enough?
 	    }
-		// TODO: implement
+		for (Critter crit:population) {
+			while(crit.check_encounter()!=null) {
+				//do fight
+			}
+		}
 	}
 	
 	public static void displayWorld() {
@@ -260,5 +300,9 @@ public abstract class Critter {
 		
 		// Complete this method.
 		// TODO: debug!
+	}
+	
+	protected final Critter look(int direction) {
+		xcoord = 
 	}
 }
