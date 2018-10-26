@@ -50,43 +50,70 @@ public abstract class Critter {
 	
 	private int x_coord;
 	private int y_coord;
-	private int version;
-	private static int global_version = 0;
 	
+	/*
+	 * version is essentially a fix to avoid having to iterate through boolean hasMoved flags
+	 * Is set to global_version when the Critter has moved, so if version != global_version, a
+	 *     Critter may move.
+	 */
+	private long version;
+	private static long global_version = 0;
+	
+	/*
+	 * This boolean flag represents whether or not worldTimeStep() is in the encounter phase
+	 * Since the Critters can only move during the movement phase and encounter phase, this being false
+	 *     implies the movement phase, so we need not check the critter versions 
+	 */
 	private static boolean determining_encounters;
 	
+	/**
+	 * Attempt to take 1 step in a given direction. Checks if caller has moved this turn already. Deducts Params.walk_energy_cost regardless
+	 * @param direction The direction to run
+	 */
 	protected final void walk(int direction) {
-		
-		if (this.version != global_version) {
-		this.x_coord = newX(this.x_coord,direction,1);
-		this.y_coord = newX(this.y_coord,direction,1);
-		this.version = global_version;
-		}
-		
 		this.energy -= Params.walk_energy_cost;
+		if (this.version != global_version) {
+			if(determining_encounters && look(direction, 1) != null) { // if fleeing combat
+				return; // attempt to move blocked by another critter
+			}
+			this.x_coord = newX(this.x_coord,direction,1);
+			this.y_coord = newX(this.y_coord,direction,1);
+			this.version = global_version;
+		}
 	}
 	
-//	private final void updatecoord() {
-//		
-//	}
-	
-	
+	/**
+	 * Attempt to take 2 steps in a given direction. Checks if caller has moved this turn already. Deducts Params.run_energy_cost regardless.
+	 *  If a Critter is calling to attempt to flee combat, checks to see if movement will be blocked by another Critter.
+	 * @param direction The direction to run
+	 */
 	protected final void run(int direction) {
-		if(this.version != global_version) {
-		this.x_coord = newX(this.x_coord,direction,2);
-		this.y_coord = newX(this.y_coord,direction,2);
-		this.version = global_version;
-		}
 		this.energy -= Params.run_energy_cost;
+		if (this.version != global_version) {
+			if(determining_encounters && look(direction, 2) != null) { // if fleeing combat
+				return; // attempt to move blocked by another critter
+			}
+			this.x_coord = newX(this.x_coord,direction,2);
+			this.y_coord = newX(this.y_coord,direction,2);
+			this.version = global_version;
+		}
+		
 		// TODO: verify/debug
 	}
 	
-	private final int newX(int current_x,int direction,int numstepstodo) {
+	/**
+	 * Determine what x coordinate will be after a specified move
+	 * @param current_x The current x coordinate
+	 * @param direction The direction to move (0-7)
+	 * @param steps How many steps to take in said direction
+	 * @return The resulting x coordinate after the move.
+	 */
+	private final int newX(int current_x, int direction, int steps) {
 		if(direction == 7 || direction < 2) {
-			current_x+=numstepstodo;
+			current_x += steps;
 		}
 		else if(direction > 2 && direction < 6) {
-			current_x-=numstepstodo;
+			current_x -= steps;
 		}
 		
 		current_x = current_x % Params.world_width;
@@ -95,12 +122,20 @@ public abstract class Critter {
 		}
 		return current_x;
 	}
-	private final int newY(int current_y,int direction,int numstepstodo) {
+	
+	/**
+	 * Determine what y coordinate will be after a specified move
+	 * @param current_y The current y coordinate
+	 * @param direction The direction to move (0-7)
+	 * @param steps How many steps to take in said direction
+	 * @return The resulting y coordinate after the move.
+	 */
+	private final int newY(int current_y,int direction,int steps) {
 		if(direction == 7 || direction < 2) {
-			current_y+=numstepstodo;
+			current_y+=steps;
 		}
 		else if(direction > 2 && direction < 6) {
-			current_y-=numstepstodo;
+			current_y-=steps;
 		}
 		current_y = current_y % Params.world_height;
 		if(current_y < 0) {
@@ -109,25 +144,42 @@ public abstract class Critter {
 		return current_y;
 	}
 	
+	/**
+	 * Look at a potential walk/run coordinate and find the first alive critter that is there.
+	 * @param direction The direction to look (0-7)
+	 * @param num_steps How many steps in said direction to go to look
+	 * @return The first Critter found to inhabit the space. Null if none.
+	 */
 	private final Critter look(int direction, int num_steps) {
 		for (Critter crit:population) {
-			if (crit.x_coord == newX(this.x_coord,direction,num_steps) &&crit.y_coord == newX(this.y_coord,direction,num_steps)) {
+			if (crit.x_coord == newX(this.x_coord,direction,num_steps) && crit.y_coord == newY(this.y_coord,direction,num_steps) && crit.energy > 0 && crit != this) {
 				return crit;
 			}
 		}
 		return null;
 	}
 	
+	/**
+	 * Iterate through the list of critters and return the first other one that shares the same space and is alive
+	 * @return The first non-calling alive critter at caller's location. Null if none exists
+	 */
 	private final Critter check_encounter() {
-		for (Critter crit:population) {
-			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0 && crit != this) {
-				return crit;
-			}
-
-		}
-		return null;
+		return look(0, 0);
+//		for (Critter crit:population) {
+//			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0 && crit != this) {
+//				return crit;
+//			}
+//
+//		}
+//		return null;
 	}
 	
+	/**
+	 * The method a Critter will call when it wishes to reproduce. Checks minimum energy,
+	 *  and adds the offspring to the babies list at the appropriate location.
+	 * @param offspring The baby to add
+	 * @param direction Where relative to the parent to put the baby
+	 */
 	protected final void reproduce(Critter offspring, int direction) {
 		if(this.energy < Params.min_reproduce_energy) {
 			return;
@@ -273,6 +325,7 @@ public abstract class Critter {
 			return babies;
 		}
 	}
+	// End test critter!
 
 	/**
 	 * Clear the world of all critters, dead and alive
@@ -282,12 +335,18 @@ public abstract class Critter {
 		babies = new java.util.ArrayList<Critter>();
 	}
 	
+	/**
+	 * Advance the Critter World by one time step, first by calling doTimeStep() for every critter,
+	 *  then by running through encounters. These are then followed by a culling of the dead, and
+	 *  then the addition of babies and Algae.
+	 */
 	public static void worldTimeStep() {
 		global_version++;
+		// All Critters doTimeStep()
 	    for(Critter crit : population) {
 	    	crit.doTimeStep(); // theoretically enough?
 	    }
-	    
+	    // Check encounters
 		for (Critter crit:population) {
 			if(crit.energy < 1) {
 				continue;
@@ -323,7 +382,7 @@ public abstract class Critter {
 			}
 			crit.energy -= Params.rest_energy_cost;
 		}
-		
+		// Cull the dead
 		Iterator it = population.iterator();
 		while(it.hasNext()) {
 			Critter crit = (Critter) it.next();
@@ -331,6 +390,7 @@ public abstract class Critter {
 				it.remove();
 			}
 		}
+		// Add babies and Algae
 		population.addAll(babies);
 		babies = new java.util.ArrayList<Critter>();
 		for(int i = 0; i < Params.refresh_algae_count; i++) {
@@ -341,9 +401,14 @@ public abstract class Critter {
 				// we are assuming that algae is to be included, so we need not do anything here
 			}
 		}
+		// TODO: verify
 		
 	}
 	
+	/**
+	 * Print to the console the current state of the Critter world, 
+	 * with all critters being represented by their toString()
+	 */
 	public static void displayWorld() {
 		String top_and_bottom = "+";
 		for(int i = 0; i < Params.world_width; i++) {
@@ -370,9 +435,7 @@ public abstract class Critter {
 			System.out.println(row);
 		}
 		System.out.println(top_and_bottom);
-		
-		// Complete this method.
-		// TODO: debug!
+		// TODO: verify
 	}
 	
 
