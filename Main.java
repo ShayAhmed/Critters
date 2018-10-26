@@ -72,107 +72,101 @@ public class Main {
         while(simulation_is_running) {
         	System.out.print("critter>");
         	String command = kb.nextLine();
-            if(command.equals("quit")) {
-            	simulation_is_running = false;
+        	String[] command_line = command.split(" ");
+            if(command_line[0].equals("quit")) {
+            	if(command_line.length == 1) {
+            		simulation_is_running = false;
+            	}
+            	else {
+            		System.out.println("error processing command: " + command);
+            	}	
             }
-            else if(command.equals("show")) {
-            	Critter.displayWorld();
+            else if(command_line[0].equals("show")) {
+            	if(command_line.length == 1) {
+            		Critter.displayWorld();
+            	}
+            	else {
+            		System.out.println("error processing command: " + command);
+            	}
             }
-            else if(command.length() >= 4) {
-            	if(command.substring(0, 4).equals("step")){
-                	String[] command_line = command.split(" ");
-                	if(command_line.length < 3) {
-                		int count = 1;
-                    	try {
-                    		if(command_line.length > 1) {
-                        		count = Integer.parseInt(command_line[1]);
-                        	}
-                    		if(count <= 0) {
-                    			throw new Exception(); // because the count was bad!
-                    		}
-                    		for(int i = 0; i < count; i++) {
-                    			Critter.worldTimeStep();
-                    		}
+            else if(command_line[0].equals("step")) {
+            	if(command_line.length < 3) {
+            		int count = 1;
+                	try {
+                		if(command_line.length > 1) {
+                    		count = Integer.parseInt(command_line[1]);
                     	}
-                    	catch(Exception e) {
-                    		System.out.println("error processing: " + command);
-                    	}
-                	}
-                	else {
-                		System.out.println("error processing: " + command);
-                	}
-                	
-                }
-                else if(command.substring(0, 4).equals("seed")) {
-                	String[] command_line = command.split(" ");
-                	if(command_line.length == 2) {
-                		long seed = 0;
-                    	try {
-                    		seed = Long.parseLong(command_line[1]);
-                    		Critter.setSeed(seed);
-                    	}
-                    	catch(Exception e) {
-                    		System.out.println("error processing: " + command);
-                    	}
-                	}
-                	else {
-                		System.out.println("error processing: " + command);
-                	}
-                	
-                }
-                else if(command.substring(0, 4).equals("make")) {
-                	String[] command_line = command.split(" ");
-                	if(command_line.length < 4) {
-                		int count = 1;
-                    	try {
-                    		if(command_line.length > 2) {
-                    			count = Integer.parseInt(command_line[2]); // will only be run if a third token was provided
-                    		}
-                    		for(int i = 0; i < count; i++) {
-                    			Critter.makeCritter(command_line[1]);
-                    		}
-                    	}
-                    	catch(Exception e) {
-                    		System.out.println("error processing: " + command);
-                    	}
-                	}
-                	else {
-                		System.out.println("error processing: " + command);
-                	}
-                	
-                }
-                else if(command.length() >= 5) {
-                	if(command.substring(0, 5).equals("stats")) {
-                		String[] command_line = command.split(" ");
-                		if(command_line.length < 3) {
-                			try {
-                				java.util.List<Critter> instances = Critter.getInstances(command_line[1]);
-                				try {
-                					Class critterClass = Class.forName(myPackage + "." + command_line[1]);
-                					critterClass.getMethod("runStats", java.util.List.class).invoke(null, instances); // null is object being invoked from, but this is static!
-                				}
-                				catch(Exception e) {
-                					// runStats was not implemented by the given subclass of Critter, so do Critter.runStats instead
-                					Critter.runStats(instances);
-                				}
-                        		
-                        	}
-                        	catch(Exception e) {
-                        		System.out.println("error processing: " + command);
-                        	}
+                		if(count <= 0) {
+                			throw new Exception(); // because the count was bad!
                 		}
-                		else {
-                			System.out.println("error processing: " + command);
+                		for(int i = 0; i < count; i++) {
+                			Critter.worldTimeStep();
                 		}
-                    	
                 	}
-                	else {
-                		System.out.println("invalid command: " + command);
+                	catch(Exception e) {
+                		System.out.println("error processing: " + command);
                 	}
-                }
-                else {
-                	System.out.println("invalid command: " + command);
-                }
+            	}
+            	else {
+            		System.out.println("error processing command: " + command);
+            	}
+            	
+            }
+            else if(command_line[0].equals("seed")) {
+            	if(command_line.length == 2) {
+            		long seed = 0;
+                	try {
+                		seed = Long.parseLong(command_line[1]);
+                		Critter.setSeed(seed);
+                	}
+                	catch(Exception e) {
+                		System.out.println("error processing: " + command);
+                	}
+            	}
+            	else {
+            		System.out.println("error processing: " + command);
+            	}
+            }
+            else if(command_line[0].equals("make")) {
+            	if(command_line.length < 4) {
+            		int count = 1;
+                	try {
+                		if(command_line.length > 2) {
+                			count = Integer.parseInt(command_line[2]); // will only be run if a third token was provided
+                		}
+                		for(int i = 0; i < count; i++) {
+                			Critter.makeCritter(command_line[1]);
+                		}
+                	}
+                	catch(Exception e) {
+                		System.out.println("error processing: " + command);
+                	}
+            	}
+            	else {
+            		System.out.println("error processing: " + command);
+            	}
+            }
+            else if(command_line[0].equals("stats")) {
+            	if(command_line.length < 3) {
+        			try {
+        				java.util.List<Critter> instances = Critter.getInstances(command_line[1]);
+        				try {
+        					Class critterClass = Class.forName(myPackage + "." + command_line[1]);
+        					critterClass.getMethod("runStats", java.util.List.class).invoke(null, instances); // null is object being invoked from, but this is static!
+        				}
+        				catch(Exception e) {
+        					// runStats was not implemented by the given subclass of Critter, so do Critter.runStats instead
+        					Critter.runStats(instances);
+        				}
+                		
+                	}
+                	catch(Exception e) {
+                		System.out.println("error processing: " + command);
+                	}
+        		}
+        		else {
+        			System.out.println("error processing: " + command);
+        		}
             }
             else {
             	System.out.println("invalid command: " + command);
