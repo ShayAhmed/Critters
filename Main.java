@@ -133,6 +133,10 @@ public class Main {
                 	try {
                 		if(command_line.length > 2) {
                 			count = Integer.parseInt(command_line[2]); // will only be run if a third token was provided
+                			if(count < 0) {
+                				System.out.println("error processing: " + command);
+                				continue;
+                			}
                 		}
                 		for(int i = 0; i < count; i++) {
                 			Critter.makeCritter(command_line[1]);
@@ -151,6 +155,9 @@ public class Main {
         			try {
         				java.util.List<Critter> instances = Critter.getInstances(command_line[1]);
         				try {
+        					if(command_line[1].equals("Critter") || command_line[1].equals("testCritter")) {
+        						System.out.println("error processing: " + command);
+        					}
         					Class critterClass = Class.forName(myPackage + "." + command_line[1]);
         					critterClass.getMethod("runStats", java.util.List.class).invoke(null, instances); // null is object being invoked from, but this is static!
         				}

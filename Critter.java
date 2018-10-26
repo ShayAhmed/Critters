@@ -65,11 +65,13 @@ public abstract class Critter {
 	 *     implies the movement phase, so we need not check the critter versions 
 	 */
 	private static boolean determining_encounters;
+	
 	private static boolean doingWorldTimeStep = false; // Basically, only check for multiple movements if worldTimeStep is being called - prevents errors in grading scripts
 	
 	/**
 	 * Attempt to take 1 step in a given direction. Checks if caller has moved this turn already. Deducts Params.walk_energy_cost regardless
-	 * @param direction The direction to run
+	 *  If a Critter is calling to attempt to flee combat, checks to see if movement will be blocked by another Critter.
+	 * @param direction The direction to walk
 	 */
 	protected final void walk(int direction) {
 		this.energy -= Params.walk_energy_cost;
@@ -98,8 +100,6 @@ public abstract class Critter {
 			this.y_coord = newY(this.y_coord, direction,2);
 			this.version = global_version;
 		}
-		
-		// TODO: verify/debug
 	}
 	
 	/**
@@ -167,18 +167,11 @@ public abstract class Critter {
 	 */
 	private final Critter check_encounter() {
 		return look(0, 0);
-//		for (Critter crit:population) {
-//			if (crit.x_coord == this.x_coord &&crit.y_coord == this.y_coord &&crit.energy>0 && crit != this) {
-//				return crit;
-//			}
-//
-//		}
-//		return null;
 	}
 	
 	/**
 	 * The method a Critter will call when it wishes to reproduce. Checks minimum energy,
-	 *  and adds the offspring to the babies list at the appropriate location.
+	 *  and adds the offspring to the babies list at the appropriate location. Initializes inherited baby fields.
 	 * @param offspring The baby to add
 	 * @param direction Where relative to the parent to put the baby
 	 */
@@ -220,12 +213,12 @@ public abstract class Critter {
 			created_critter.x_coord = Critter.getRandomInt(Params.world_width);
 			created_critter.y_coord = Critter.getRandomInt(Params.world_height);
 			created_critter.version = global_version;
-			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
+			population.add(created_critter);
 		}
 		catch(Exception e) {
-			throw new InvalidCritterException(critter_class_name); // This may be too general; do we blame the class name for all problems?
+			throw new InvalidCritterException(critter_class_name);
 		}
-		// TODO: verify/debug
+		// TODO: verify
 	}
 	
 	/**
@@ -272,8 +265,7 @@ public abstract class Critter {
 			System.out.print(prefix + s + ":" + critter_count.get(s));
 			prefix = ", ";
 		}
-		System.out.println();	
-		// TODO: is this final? Do we need to implement anything more for this method?
+		System.out.println();
 	}
 	
 	/* the TestCritter class allows some critters to "cheat". If you want to 
@@ -339,8 +331,8 @@ public abstract class Critter {
 	
 	/**
 	 * Advance the Critter World by one time step, first by calling doTimeStep() for every critter,
-	 *  then by running through encounters. These are then followed by a culling of the dead, and
-	 *  then the addition of babies and Algae.
+	 *  then by running through encounters. These are then followed by application of resting costs, 
+	 *  a culling of the dead, and then the addition of babies and Algae to the main population.
 	 */
 	public static void worldTimeStep() {
 		doingWorldTimeStep = true;
