@@ -215,8 +215,8 @@ public abstract class Critter {
 			Class critter_class = Class.forName(myPackage + "." + critter_class_name);
 			Critter created_critter = (Critter) critter_class.newInstance();
 			created_critter.energy = Params.start_energy;
-			created_critter.x_coord = Critter.getRandomInt(Params.world_width - 1);
-			created_critter.y_coord = Critter.getRandomInt(Params.world_height - 1);
+			created_critter.x_coord = Critter.getRandomInt(Params.world_width);
+			created_critter.y_coord = Critter.getRandomInt(Params.world_height);
 			created_critter.version = global_version;
 			population.add(created_critter);  // Will this even work? It may not be specific enough for our needs
 		}
