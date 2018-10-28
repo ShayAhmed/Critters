@@ -51,7 +51,7 @@ public abstract class Critter {
 	private int x_coord;
 	private int y_coord;
 	
-	/*
+	/**
 	 * version is essentially a fix to avoid having to iterate through boolean hasMoved flags
 	 * Is set to global_version when the Critter has moved, so if version != global_version, a
 	 *     Critter may move.
@@ -59,7 +59,7 @@ public abstract class Critter {
 	private long version;
 	private static long global_version = 0;
 	
-	/*
+	/**
 	 * This boolean flag represents whether or not worldTimeStep() is in the encounter phase
 	 * Since the Critters can only move during the movement phase and encounter phase, this being false
 	 *     implies the movement phase, so we need not check the critter versions 
@@ -218,7 +218,6 @@ public abstract class Critter {
 		catch(Exception e) {
 			throw new InvalidCritterException(critter_class_name);
 		}
-		// TODO: verify
 	}
 	
 	/**
@@ -240,7 +239,6 @@ public abstract class Critter {
 				result.add(critter);
 			}
 		}
-		// TODO: verify/debug
 		return result;
 	}
 	
@@ -340,7 +338,7 @@ public abstract class Critter {
 		global_version++;
 		// All Critters doTimeStep()
 	    for(Critter crit : population) {
-	    	crit.doTimeStep(); // theoretically enough?
+	    	crit.doTimeStep();
 	    }
 	    // Check encounters
 	    determining_encounters = true;
@@ -399,7 +397,6 @@ public abstract class Critter {
 			// Will only fail if algae class is not provided - in which case we don't need to do anything anyways!
 		}
 		doingWorldTimeStep = false;
-		// TODO: verify
 		
 	}
 	
@@ -433,7 +430,6 @@ public abstract class Critter {
 			System.out.println(row);
 		}
 		System.out.println(top_and_bottom);
-		// TODO: verify
 	}
 	
 

@@ -22,6 +22,11 @@ public class Critter2 extends Critter {
 	private boolean has_moved;
 	private static boolean reproducing = false;
 	
+	/**
+	 * The function that determines what this critter does each world time step. This species of critter will calculate the current
+	 *  Algae-to-world-area ratio and the Critter2-count-to-world-area ratios to determine whether to move and/or breed.
+	 *  
+	 */
 	@Override
 	public void doTimeStep() {
 		has_moved = false;
@@ -48,6 +53,13 @@ public class Critter2 extends Critter {
 		}
 	}
 
+	/**
+	 * Whether this critter will fight another critter when they share a space. If this critter didn't move during its doTimeStep(), it will
+	 *  attempt to flee. If it fails to flee, then it will fight.
+	 * 
+	 * @param oponent The String representation of the other critter this critter may fight. (unused)
+	 * @return Whether this critter will fight the other. (always true)
+	 */
 	@Override
 	public boolean fight(String oponent) {
 		if(!has_moved) { // attempt to flee combat first
@@ -56,11 +68,21 @@ public class Critter2 extends Critter {
 		return true;
 	}
 	
+	/**
+	 * How this critter appears in the world
+	 * 
+	 * @return "2"
+	 */
 	@Override
 	public String toString() {
 		return "2";
 	}
 	
+	/**
+	 * This override of the runStats method indicates the current count of Critter2's and whether the species is reproducing.
+	 *  
+	 * @param population The List of all Critter2 instances
+	 */
 	public static void runStats(java.util.List<Critter> population) {
 		System.out.print(population.size() + " total Critter2.");
 		if(reproducing) {
