@@ -96,8 +96,8 @@ public abstract class Critter {
 			if(determining_encounters && look(direction, 2) != null) { // if fleeing combat
 				return; // attempt to move blocked by another critter
 			}
-			this.x_coord = newX(this.x_coord, direction,2);
-			this.y_coord = newY(this.y_coord, direction,2);
+			this.x_coord = newX(this.x_coord, direction, 2);
+			this.y_coord = newY(this.y_coord, direction, 2);
 			this.version = global_version;
 		}
 	}
@@ -117,7 +117,7 @@ public abstract class Critter {
 			current_x -= steps;
 		}
 		if(current_x < 0) {
-			current_x = Params.world_width - 1;
+			current_x += Params.world_width;
 		}
 		current_x = current_x % Params.world_width;
 		return current_x;
@@ -138,7 +138,7 @@ public abstract class Critter {
 			current_y += steps;
 		}
 		if(current_y < 0) {
-			current_y = Params.world_height - 1;
+			current_y += Params.world_height;
 		}
 		current_y = current_y % Params.world_height;
 		return current_y;
