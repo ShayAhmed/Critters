@@ -72,6 +72,9 @@ public class Main {
         while(simulation_is_running) {
         	System.out.print("critter>");
         	String command = kb.nextLine();
+        	while(command.charAt(0) == ' ') {
+        		command = command.substring(1, command.length());
+        	}
         	String[] command_line = command.split(" ");
             if(command_line[0].equals("quit")) {
             	if(command_line.length == 1) {
